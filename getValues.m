@@ -1,4 +1,4 @@
-function rawKeys = getRawKeys( dft_data  )
+function final_val = getValues( data  )
 % Function to decode each of the frames to get the number represented by
 % the data from the Goertzel Calculation. the argument "magData" is a
 % vector with the magnitudes of each of the DTMF Frequencies in the frame
@@ -8,7 +8,7 @@ function rawKeys = getRawKeys( dft_data  )
 % has the numbers decoded from every frame present. frames that represent a
 % "silence" will be shows as "_" strings
 
-    rawKeys = repmat('~',[1,size(dft_data,2)]);
+    init_val = repmat('~',[1,size(data,2)]);
     %freq_low = [697,770,582,941];
     %freq_high = [1209,1336,1477,1633];
     
@@ -27,10 +27,10 @@ function rawKeys = getRawKeys( dft_data  )
     % of the average of the top 3 peaks.
     
     % get the top 3 frames from first 20
-    if (length(dft_data) >= 50)
-        first20 = sort(mean(dft_data(:,1:50)),'descend');
+    if (length(data) >= 50)
+        f20 = sort(mean(data(:,1:50)),'descend');
     else
-        first20 = sort(mean(dft_data),'descend');
+        f20 = sort(mean(data),'descend');
     end
     
     % remove the frames with an avg of zero and use that array for the
@@ -38,69 +38,90 @@ function rawKeys = getRawKeys( dft_data  )
     
     
     
-    if (size(first20,2) < 6)
-        topAvg = mean(first20(1));
+    if (size(f20,2) < 6)
+        avg = mean(f20(1));
     else
-        topAvg = mean(first20(2:6)); % average of the top 5
+        avg = mean(f20(2:6)); % average of the top 5
     end
     
     % go through all the frames, decode frames with a mean greatere than
     % 10% of 'topAvg'
     
-    for j = 1 : size(dft_data,2) % for each decoded frame
+    for j = 1 : size(data,2) % for each decoded frame
         %get index of highest DTMF high and low frequencies
-        if (mean(dft_data(:,j)) < (0.66 * topAvg))
-            rawKeys(j) = '_';
+        if (mean(data(:,j)) < (0.66 * avg))
+            init_val(j) = '_';
             
         else
-            [a,low] = max(dft_data(1:4,j));
-            [a,high] = max(dft_data(5:8,j));
+            [a,low] = max(data(1:4,j));
+            [a,high] = max(data(5:8,j));
 
             % find the corresponding frequencies
             if (low == 1) %low = 697
                 if (high == 1)      %high = 1209
-                    rawKeys(j) = '1';
+                    init_val(j) = '1';
                 elseif (high == 2) %high = 1336
-                    rawKeys(j) = '2';
+                    init_val(j) = '2';
                 elseif (high == 3) %high = 1477
-                    rawKeys(j) = '3';
+                    init_val(j) = '3';
                 elseif (high == 4) %high = 1633
-                    rawKeys(j) = 'A';
+                    init_val(j) = 'A';
                 end
             elseif (low == 2) %low = 770
                 if (high == 1)      %high = 1209
-                    rawKeys(j) = '4';
+                    init_val(j) = '4';
                 elseif (high == 2) %high = 1336
-                    rawKeys(j) = '5';
+                    init_val(j) = '5';
                 elseif (high == 3) %high = 1477
-                    rawKeys(j) = '6';
+                    init_val(j) = '6';
                 elseif (high == 4) %high = 1633
-                    rawKeys(j) = 'B';
+                    init_val(j) = 'B';
                 end
             elseif (low == 3) %low = 852
                 if (high == 1)      %high = 1209
-                    rawKeys(j) = '7';
+                    init_val(j) = '7';
                 elseif (high == 2) %high = 1336
-                    rawKeys(j) = '8';
+                    init_val(j) = '8';
                 elseif (high == 3) %high = 1477
-                    rawKeys(j) = '9';
+                    init_val(j) = '9';
                 elseif (high == 4) %high = 1633
-                    rawKeys(j) = 'C';
+                    init_val(j) = 'C';
                 end
             elseif (low == 4) %low = 941
                 if (high == 1)      %high = 1209
-                    rawKeys(j) = '*';
+                    init_val(j) = '*';
                 elseif (high == 2) %high = 1336
-                    rawKeys(j) = '0';
+                    init_val(j) = '0';
                 elseif (high == 3) %high = 1477
-                    rawKeys(j) = '#';
+                    init_val(j) = '#';
                 elseif (high == 4) %high = 1633
-                    rawKeys(j) = 'D';
+                    init_val(j) = 'D';
                 end
             end
         end
         
     end % end of loop through each frame
     
-end % end of function
 
+%Function to retrieve the actual sequence of DTMF tones represented by the
+%data. The input is the data from the getRawKeys() function which will be a
+%string representing the DTMF character from each frames
+
+    % go through the whole string, if the current char is not a "_",
+    % add that char to the output sequence and skip to the next "_"
+    % char
+    
+    final_val = '';
+    if (init_val(1) ~= '_')
+        final_val = init_val(1);
+    end
+    for i = 2 : length(init_val)
+        if (init_val(i) == '_' && init_val(i-1) ~= '_')
+            final_val = strcat(final_val,' ');
+        elseif (init_val(i) ~= init_val(i-1))
+            final_val = strcat(final_val,init_val(i));
+        end
+        
+    end %end of for loop
+    
+end %end of function
