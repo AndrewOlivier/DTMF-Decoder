@@ -3,5 +3,5 @@
     [data,Fs] = audioread('abcd.wav');
 
     blocks = createBlocks(data);
-    data = DetectTones(blocks,Fs);
-    Values = getValues(data)
+    tones = DetectTones(blocks,Fs);
+    Values = getValues(tones)
