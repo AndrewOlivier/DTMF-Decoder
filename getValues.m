@@ -1,42 +1,26 @@
-function final_val = getValues( data  )
-% Function to decode each of the frames to get the number represented by
-% the data from the Goertzel Calculation. the argument "magData" is a
-% vector with the magnitudes of each of the DTMF Frequencies in the frame
-% they were extracted from.
+function final_val = getValues(tones)
+% Decode each of the blocks to get the number represented by
+% the data from the Goertzel Calculation. 
 
-% the output "rawKeys" will be the number represented by each frame. This
-% has the numbers decoded from every frame present. frames that represent a
+% the output "in_val" will be the number represented by each frame. This
+% has the numbers decoded from every frame present. Blocks that represent a
 % "silence" will be shows as "_" strings
 
-    init_val = repmat('~',[1,size(data,2)]);
-    %freq_low = [697,770,582,941];
-    %freq_high = [1209,1336,1477,1633];
+    init_val = repmat('~',[1,size(tones,2)]);
     
     %go through each vector and first determine whether it is a silence or
     %an actual DTMF. if it is a silent, add '_' to the output. if it is not
     %a silence, get the indicies of the two highest peaks.
-
-    % after some observation, noticed that the mean of the frames with DTMF
-    % frequencies is much higher that the mean of "silent" frames,
-    
-    % find the 3 largest averages in the frames.
-    % not efficient to go through the whole data set there
-    % * get top 3 in the first 20 frames
-    % * find average of those 3 peaks
-    % * the silent frames will be frames with a mean that is less than 10%
-    % of the average of the top 3 peaks.
     
     % get the top 3 frames from first 20
-    if (length(data) >= 50)
-        f20 = sort(mean(data(:,1:50)),'descend');
+    if (length(tones) >= 50)
+        f20 = sort(mean(tones(:,1:50)),'descend');
     else
-        f20 = sort(mean(data),'descend');
+        f20 = sort(mean(tones),'descend');
     end
     
     % remove the frames with an avg of zero and use that array for the
     % averaging
-    
-    
     
     if (size(f20,2) < 6)
         avg = mean(f20(1));
@@ -44,17 +28,17 @@ function final_val = getValues( data  )
         avg = mean(f20(2:6)); % average of the top 5
     end
     
-    % go through all the frames, decode frames with a mean greatere than
+    % go through all the frames, decode frames with a mean greater than
     % 10% of 'topAvg'
     
-    for j = 1 : size(data,2) % for each decoded frame
+    for j = 1 : size(tones,2) % for each decoded frame
         %get index of highest DTMF high and low frequencies
-        if (mean(data(:,j)) < (0.66 * avg))
+        if (mean(tones(:,j)) < (0.66 * avg))
             init_val(j) = '_';
             
         else
-            [a,low] = max(data(1:4,j));
-            [a,high] = max(data(5:8,j));
+            [a,low] = max(tones(1:4,j));
+            [a,high] = max(tones(5:8,j));
 
             % find the corresponding frequencies
             if (low == 1) %low = 697
@@ -103,8 +87,8 @@ function final_val = getValues( data  )
     end % end of loop through each frame
     
 
-%Function to retrieve the actual sequence of DTMF tones represented by the
-%data. The input is the data from the getRawKeys() function which will be a
+%Retrieve the actual sequence of DTMF tones represented by the
+%data. The input is the data from 'init_val' which will be a
 %string representing the DTMF character from each frames
 
     % go through the whole string, if the current char is not a "_",
@@ -122,6 +106,6 @@ function final_val = getValues( data  )
             final_val = strcat(final_val,init_val(i));
         end
         
-    end %end of for loop
+    end 
     
-end %end of function
+end 

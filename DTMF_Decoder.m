@@ -5,5 +5,5 @@
     plot(data); xlabel('Samples'); ylabel('Amplitude');   
        
     blocks = createBlocks(data);
-    data = DetectTones(blocks,Fs);
-    Values = getValues(data)
+    tones = DetectTones(blocks,Fs);
+    Values = getValues(tones)
