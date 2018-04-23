@@ -34,14 +34,16 @@ function tones  = DetectTones( blocks, Fs )
         tones(7,f) = max(output(15:17,f));    % 1477Hz
         tones(8,f) = max(output(18:21,f));    % 1633Hz
     end
-    p=1
-    for k = 3:9:33
-        subplot(4,1,p);
-        stem(fre,tones(:,k))
-        ax = gca;
-        ax.XTick = fre;
-        xlabel('Frequency (Hz)');
-        title('DFT Magnitude');
-        p = p+1;
-    end
+   % size(blocks,2)
+   % p=1;
+    %for k = 1:976:size(blocks,2)
+     %   subplot(4,1,p);
+      %  stem(fre,tones(:,k))
+       % ax = gca;
+       % ax.XTick = fre;
+       % xlabel('Frequency (Hz)');
+       % title('DFT Magnitude');
+       % p = p+1;
+  %  end
+    
 end 

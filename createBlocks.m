@@ -1,9 +1,7 @@
-
 function blocks = createBlocks (data)
 	%Make blocks of size "block size" and return
     %a matrix with each of the columns as a seperate block for processing
-    Fs=8000;
-    blockSize = 400;
+    blockSize = 370;
 
     if (length(data) < blockSize)
         blockSize = length(data);
@@ -26,9 +24,5 @@ function blocks = createBlocks (data)
         col = col+1;
         
     end 
-    
-        figure
-        a_plot = new(:,1);
-        plot(a_plot); xlabel('Samples'); ylabel('Amplitude');
     
 end 

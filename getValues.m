@@ -33,7 +33,7 @@ function final_val = getValues(tones)
     
     for j = 1 : size(tones,2) % for each decoded frame
         %get index of highest DTMF high and low frequencies
-        if (mean(tones(:,j)) < (0.66 * avg))
+        if (mean(tones(:,j)) < (0.50 * avg))
             init_val(j) = '_';
             
         else
